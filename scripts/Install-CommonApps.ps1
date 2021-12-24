@@ -9,56 +9,18 @@ This script installs and/or upgrades the common Windows Apps
 .\Install-CommonApps.ps1
 #>
 
+$packages = @(
+    "7zip"
+    "googlechrome"
+    "python"
+    "sysinternals"
+    "vlc"
+    "vscode"
+)
 
 # Set cache path
 $cachePath = Set-TempDirectory
 # Install common packages that everyone should have
-choco upgrade -cache $cachePath -y git --package-parameters="'/GitAndUnixToolsOnPath /WindowsTerminal'"
-choco upgrade -cache $cachePath -y 7zip chocolateygui keepass sysinternals mobaxterm
-#choco upgrade -cache $cachePath -y python3 --installargs='TargetDir=""C:\Program Files\Python3""'
-#choco upgrade -cac he $cachePath -y atom
-
-
-#   Description:
-# This script will use Windows package manager to bootstrap Chocolatey and
-# install a list of packages. Script will also install Sysinternals Utilities
-# into your default drive's root directory.
-
-$packages = @(
-    "curl"
-    "cmake"
-    "7zip"
-    "SublimeText3"
-    "classic-shell"
-    "google-chrome-x64"
-    "paint.net"
-    "putty"
-    "python"
-    "sysinternals"
-    "vlc"
-    "wireshark"
-)
-
-echo "Setting up Chocolatey software package manager"
-Get-PackageProvider -Name chocolatey -Force
-
-echo "Setting up Full Chocolatey Install"
-Install-Package -Name Chocolatey -Force -ProviderName chocolatey
-$chocopath = (Get-Package chocolatey | ?{$_.Name -eq "chocolatey"} | Select @{N="Source";E={((($a=($_.Source -split "\\"))[0..($a.length - 2)]) -join "\"),"Tools\chocolateyInstall" -join "\"}} | Select -ExpandProperty Source)
-& $chocopath "upgrade all -y"
-choco install chocolatey-core.extension --force
-
-echo "Creating daily task to automatically upgrade Chocolatey packages"
-# adapted from https://blogs.technet.microsoft.com/heyscriptingguy/2013/11/23/using-scheduled-tasks-and-scheduled-jobs-in-powershell/
-$ScheduledJob = @{
-    Name = "Chocolatey Daily Upgrade"
-    ScriptBlock = {choco upgrade all -y}
-    Trigger = New-JobTrigger -Daily -at 2am
-    ScheduledJobOption = New-ScheduledJobOption -RunElevated -MultipleInstancePolicy StopExisting -RequireNetwork
-}
-Register-ScheduledJob @ScheduledJob
-
 echo "Installing Packages"
-$packages | %{choco install $_ --force -y}
-
-setx PATH "%PATH%;c:\programdata\chocolatey\bin;C:\Program Files\CMake\bin"
+choco upgrade -cache $cachePath -y git --package-parameters="'/GitAndUnixToolsOnPath /WindowsTerminal'"
+$packages | %{choco upgrade -cache $cachePath -y $_ --force -y}
