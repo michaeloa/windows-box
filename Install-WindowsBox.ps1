@@ -15,8 +15,8 @@ https://github.com/michaeloa/windows-box
 Write-Verbose "Installing Windows Box..."
 # Define Utility functions
 Set-ExecutionPolicy Bypass -Scope Process -Force
-. .\scripts\Set-TempDirectory
-. .\scripts\Get-UserSID
+. .\libs\Set-TempDirectory
+. .\libs\Get-UserSID
 # Install Chocolatey
 .\scripts\Install-Chocolatey.ps1
 # Configure Windows
